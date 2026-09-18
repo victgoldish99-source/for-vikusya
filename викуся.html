@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Викуся, ты справляешься</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 50%, #c2e9fb 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 15s ease infinite;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    color: #4a3f6b;
+    padding: 20px;
+  }
+
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .blob1 { width: 400px; height: 400px; background: #ffd6e8; top: -100px; left: -100px; animation: float1 20s ease-in-out infinite; }
+  .blob2 { width: 350px; height: 350px; background: #d6e4ff; bottom: -80px; right: -80px; animation: float2 25s ease-in-out infinite; }
+  .blob3 { width: 300px; height: 300px; background: #ffe8cc; top: 40%; left: 60%; animation: float3 22s ease-in-out infinite; }
+  @keyframes float1 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(60px, 80px); } }
+  @keyframes float2 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-70px, -50px); } }
+  @keyframes float3 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-50px, 60px); } }
+
+  .container {
+    text-align: center;
+    z-index: 10;
+    padding: 20px;
+    max-width: 620px;
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 2em;
+    margin-bottom: 12px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    color: #5b4a7e;
+    text-shadow: 0 2px 20px rgba(255, 255, 255, 0.6);
+  }
+
+  .subtitle {
+    color: #7a6a9e;
+    margin-bottom: 40px;
+    font-size: 1em;
+    line-height: 1.6;
+  }
+
+  .support-btn {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: radial-gradient(circle at 30% 30%, #ffffff, #fbc2eb, #a6c1ee);
+    box-shadow:
+      0 0 0 0 rgba(251, 194, 235, 0.7),
+      0 15px 50px rgba(166, 193, 238, 0.5),
+      inset 0 -8px 20px rgba(122, 106, 158, 0.15),
+      inset 0 8px 20px rgba(255, 255, 255, 0.8);
+    font-size: 1em;
+    color: #5b4a7e;
+    font-family: inherit;
+    font-weight: 500;
+    transition: transform 0.2s ease;
+    animation: pulse 3s infinite;
+    z-index: 10;
+  }
+  .support-btn:hover { transform: scale(1.06); }
+  .support-btn:active { transform: scale(0.94); }
+  .support-btn .emoji { display: block; font-size: 2.6em; margin-bottom: 4px; }
+
+  @keyframes pulse {
+    0%, 100% {
+      box-shadow:
+        0 0 0 0 rgba(251, 194, 235, 0.7),
+        0 15px 50px rgba(166, 193, 238, 0.5),
+        inset 0 -8px 20px rgba(122, 106, 158, 0.15),
+        inset 0 8px 20px rgba(255, 255, 255, 0.8);
+    }
+    50% {
+      box-shadow:
+        0 0 0 30px rgba(251, 194, 235, 0),
+        0 15px 60px rgba(166, 193, 238, 0.7),
+        inset 0 -8px 20px rgba(122, 106, 158, 0.15),
+        inset 0 8px 20px rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  .quote-card {
+    margin-top: 40px;
+    padding: 35px 30px;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 20px 50px rgba(166, 193, 238, 0.35);
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .quote-card.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .quote-text {
+    font-size: 1.2em;
+    line-height: 1.7;
+    color: #5b4a7e;
+    font-weight: 400;
+  }
+
+  .quote-signature {
+    margin-top: 18px;
+    font-size: 0.9em;
+    color: rgba(91, 74, 126, 0.7);
+    font-style: italic;
+  }
+
+  .counter {
+    margin-top: 25px;
+    font-size: 0.9em;
+    color: rgba(91, 74, 126, 0.6);
+    min-height: 20px;
+    transition: all 0.3s ease;
+  }
+
+  .float-up {
+    position: fixed;
+    font-size: 1.8em;
+    pointer-events: none;
+    z-index: 100;
+    animation: flyUp 3s ease-out forwards;
+    opacity: 0.9;
+  }
+  @keyframes flyUp {
+    0% { opacity: 1; transform: translate(0, 0) scale(0.5) rotate(0deg); }
+    100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(1.2) rotate(var(--r)); }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+<div class="blob blob3"></div>
+
+<div class="container">
+  <h1>Викуся, ты справляешься</h1>
+  <p class="subtitle">Нажми на кнопку, когда станет тяжело.<br>Здесь всегда найдётся что-то для тебя.</p>
+
+  <button class="support-btn" onclick="showQuote()">
+    <span class="emoji">💛</span>
+    Нажми
+  </button>
+
+  <div class="quote-card" id="quoteCard">
+    <p class="quote-text" id="quoteText"></p>
+    <p class="quote-signature">(с) твоя пидруженька Вика</p>
+  </div>
+
+  <p class="counter" id="counter"></p>
+</div>
+
+<script>
+  const quotes = [
+    'Ты делаешь больше, чем кажется. Просто это не всегда видно снаружи. 🌿',
+    'Усталость — это не слабость. Это доказательство того, что ты стараешься. 💛',
+    'Один плохой день — не вся жизнь. Завтра снова будет свет. ☀️',
+    'Ты имеешь право на паузу. Отдохнуть — это тоже работа. 🍵',
+    'Даже если сегодня ничего не получилось — ты всё равно молодец. Просто по факту. ✨',
+    'Твоя ценность не измеряется продуктивностью. Ты ценна просто так. 💫',
+    'Не сравнивай своё начало с чужой серединой. У каждого свой путь. 🌱',
+    'Дыши. Медленно. Вдох. Выдох. Ты здесь. Ты справляешься. 🕊️',
+    'Любая буря когда-нибудь заканчивается. И эта тоже. 🌈',
+    'Ты можешь не всё. И это нормально. Никто не может всё. 🌸',
+    'Ты уже пережила все свои худшие дни. Значит, переживёшь и этот. 💪',
+    'Иногда лучший шаг — просто не сдаваться. Ты не сдаёшься. Уже победа. 🏔️',
+    'Позволь себе быть не идеальной. Идеальность скучна, а ты — живая. 🌺',
+    'Ошибки — это не провал. Это то, как мы учимся. 📖',
+    'Ты важнее любой работы. Помни это, пожалуйста. 💖',
+    'Если хочется только лежать — полежи. Мир не рухнет. 🛋️',
+    'Ты не обязана всё успевать. Ты обязана только быть к себе доброй. 🤍',
+    'Сейчас тяжело — и это правда. Но это не навсегда. 🌙',
+    'Ты уже так много прошла. Оглянись — сколько всего позади. 🌟',
+    'Улыбнись. Хотя бы на секунду. Я знаю, ты можешь. 😊',
+    'Если кажется, что всё рушится — возможно, пришло время построить новое. 🏡',
+    'Ты не одна. Даже если сейчас так кажется. Я рядом. 💌',
+    'Разреши себе маленькие радости. Кофе, музыка, тёплый плед. ☕',
+    'Ты справляешься лучше, чем думаешь. Я вижу. Правда. 🌷',
+    'Твоя усталость — не приговор. Это сигнал: пора позаботиться о себе. 🛁',
+    'Ты не обязана быть сильной 24/7. Слабость — тоже часть силы. 🌊',
+    'То, что ты чувствуешь — важно. Не отмахивайся от себя. 🫶',
+    'Пусть сегодня будет хотя бы на одну добрую мысль больше. 🍀',
+    'Ты достойна отдыха. Не за что-то. Просто по факту. 🕯️',
+    'Иногда надо просто выдохнуть и сказать: «Я делаю, что могу». 🎈',
+    'Мир не требует от тебя героизма каждый день. 🌻',
+    'Ты — не свои достижения. Ты — не свои провалы. Ты — просто ты. И этого достаточно. 💎',
+    'Если сегодня только выжила — это тоже победа. 🌼',
+    'Позаботься о себе так, как позаботилась бы о лучшей подруге. 🤍',
+    'Твои чувства имеют право быть. Все. Даже тяжёлые. 🌫️',
+    'У тебя есть я. Помни об этом. 🌟',
+    'Ты справишься. Не потому что должна, а потому что сможешь. 🌱',
+    'Даже самый тёмный час имеет 60 минут. 🌙',
+    'Ты имеешь право сказать «нет». Работе, людям, всему. 🚪',
+    'Если что-то идёт не по плану — возможно, это к лучшему. 🍃',
+    'Твоё «плохо» — не навсегда. Всё проходит. И это тоже. 🌊',
+    'Разреши себе не знать, что делать. Иногда это честнее всего. 🧭',
+    'Ты не сломана. Ты просто устала. Это разные вещи. 💗',
+    'Чай, музыка, глубокий вдох — и потихоньку дальше. ☕',
+    'Ты заслуживаешь нежности. Особенно от самой себя. 🫂',
+    'Если сегодня не получилось — попробуешь завтра. Или послезавтра. 🗓️',
+    'Ты — не то, что о тебе говорят на работе. Ты гораздо больше. 🌌',
+    'Ты имеешь право быть уставшей. И говорить об этом вслух. 🗣️',
+    'Хорошо, что ты есть. Просто по факту. 🌻',
+    'Не всё должно быть сделано сегодня. Завтра тоже день. ⏳',
+    'Ты справляешься, даже когда тебе кажется, что нет. 💪',
+    'Если хочется плакать — это нормально. Это выход. Это не слабость. 💧',
+    'Ты не должна всем нравиться. Особенно там, где тебе плохо. 🚫',
+    'Каждый шаг, даже маленький — это шаг. 🐾',
+    'Позволь себе быть не в порядке. И всё равно оставаться любимой. 💝',
+    'Твоя карьера — не вся твоя жизнь. Есть ещё ты. 🎈',
+    'Обещай мне: сегодня никакого самобичевания. 🙅‍♀️',
+    'Ты делаешь достаточно. Правда. 🕊️',
+    'Даже если всё идёт не так — ты всё равно ценна. 🌷',
+    'То, что тебе тяжело — не значит, что ты слабая. Это значит, что ты человек. 💛',
+    'Ты имеешь право на отдых без чувства вины. 🛌',
+    'Всё, что ты сейчас переживаешь — временно. 🌤️',
+    'Ты в порядке. Даже если сейчас не чувствуешь этого. 🌸',
+    'Твоя работа — это не твоя ценность. 🎁',
+    'Разреши себе не быть продуктивной сегодня. 🛋️',
+    'Иногда лучший план — просто пережить этот день. ✔️',
+    'Ты важна. Больше, чем ты думаешь. 💫',
+    'Обними себя. Буквально. Прямо сейчас. 🫂',
+    'Ты сильнее, чем ты себя чувствуешь сегодня. 🦁',
+    'Плохие дни не делают тебя плохим человеком. 🌥️',
+    'Ты заслуживаешь доброты. Начни с себя. 💝',
+    'Если тебе грустно — грусти. Не надо всё время держаться. 🌧️',
+    'Ты — не свои мысли о себе. 🧠',
+    'Пусть сегодня будет что-то маленькое и приятное. Просто для тебя. 🍫',
+    'Ты делаешь максимум. Даже если кажется, что мало. 🎯',
+    'У тебя есть право на ошибку. И на вторую попытку. 🔄',
+    'Не забывай дышать. Всё остальное подождёт. 🌬️',
+    'Ты — не свои сомнения. Ты больше. ✨',
+    'Даже в самый серый день есть что-то тёплое. 🧣',
+    'Разреши себе быть медленной. 🌊',
+    'Твоё спокойствие важнее любых дедлайнов. 🕰️',
+    'Всё, что ты делаешь — уже достаточно. ✅',
+    'Ты не обязана быть лучшей. Достаточно быть собой. 🌷',
+    'Ты нужна этому миру. Прямо такая, какая есть. 🌍',
+    'Иногда надо сдаться не работе, а напряжению. 🎈',
+    'Ты не одинока. У тебя есть я. 💌',
+    'Каждое утро — шанс начать заново. 🌅',
+    'Если сегодня просто дожила до вечера — ты героиня. 🏅',
+    'Ты гораздо сильнее, чем принято думать. 🌟',
+    'Позволь себе маленькое «нет». Миру, людям, работе. 🚪',
+    'Ты имеешь право быть уставшей. И ничего не решать. 🌙',
+    'Обнимаю тебя через расстояние. 🤗',
+    'Ты справляешься лучше, чем ты себе признаёшься. 💖',
+    'То, что ты делаешь — важно. Даже если незаметно. 🌱',
+    'Позаботься сегодня о себе. Минимум на 10 минут. 🕯️',
+    'Ты — не свои неудачи. Ты — гораздо больше. 🌌',
+    'Пусть сегодня случится что-то хорошее. Хотя бы маленькое. 🍀',
+    'Ты можешь не всё. И это нормально. 🌸',
+    'Я в тебя верю. Даже когда ты сама не веришь. 💫',
+    'Ты — чудо. Просто по факту. И это правда. ✨'
+  ];
+
+  function createParticle() {
+    const el = document.createElement('div');
+    el.className = 'float-up';
+    el.textContent = ['💛','✨','🌸','🌿','💫','🤍','🌷'][Math.floor(Math.random()*7)];
+
+    const btn = document.querySelector('.support-btn');
+    const rect = btn.getBoundingClientRect();
+    el.style.left = (rect.left + rect.width/2) + 'px';
+    el.style.top = (rect.top + rect.height/2) + 'px';
+
+    const angle = Math.random() * Math.PI * 2;
+    const distance = Math.random() * 250 + 150;
+    el.style.setProperty('--x', Math.cos(angle) * distance + 'px');
+    el.style.setProperty('--y', (Math.sin(angle) * distance - 200) + 'px');
+    el.style.setProperty('--r', (Math.random() - 0.5) * 500 + 'deg');
+
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3100);
+  }
+
+  function getCount() {
+    return parseInt(localStorage.getItem('support_count') || '0', 10);
+  }
+  function incrementCount() {
+    const n = getCount() + 1;
+    localStorage.setItem('support_count', n);
+    return n;
+  }
+  function updateCounterDisplay(count) {
+    const el = document.getElementById('counter');
+    if (!el) return;
+    if (count === 0) {
+      el.textContent = '';
+    } else if (count === 1) {
+      el.textContent = 'Ты открыла это 1 раз 🌷';
+    } else {
+      el.textContent = `Ты открывала это ${count} раз 🌷`;
+    }
+  }
+
+  let lastIndex = -1;
+
+  function showQuote() {
+    const card = document.getElementById('quoteCard');
+    const text = document.getElementById('quoteText');
+
+    let idx;
+    do {
+      idx = Math.floor(Math.random() * quotes.length);
+    } while (idx === lastIndex && quotes.length > 1);
+    lastIndex = idx;
+
+    card.classList.remove('show');
+    setTimeout(() => {
+      text.textContent = quotes[idx];
+      card.classList.add('show');
+    }, 200);
+
+    for (let i = 0; i < 12; i++) {
+      setTimeout(() => createParticle(), i * 60);
+    }
+
+    if (navigator.vibrate) navigator.vibrate([40, 30, 40]);
+
+    const newCount = incrementCount();
+    updateCounterDisplay(newCount);
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    updateCounterDisplay(getCount());
+  });
+</script>
+</body>
+</html>
